@@ -11,7 +11,7 @@
 #   3. Confirm the prover/runner/server digests below were filled by a
 #      publication run. `REPLACE-AT-PUBLISH` means not published yet.
 #   4. One-line run:
-#      kurtosis run ./package --args-file package/params/public.generated.yaml --enclave zkdeal-public --image-download missing
+#      kurtosis run ./package/kurtosis.yml --args-file package/params/public.generated.yaml --enclave zkdeal-public --image-download missing
 #
 # Cases - select with the `case:` key below:
 #   base    - the bootstrap acceptance alone: L1 (geth+Lighthouse) up, CUDA

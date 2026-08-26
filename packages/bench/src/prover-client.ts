@@ -3,6 +3,7 @@ import {
   requestJson as queueRequestJson,
   requestProof as queueRequestProof,
 } from './queue-client.ts'
+import { postJsonWithDeadline } from './deadline-http-json.ts'
 import { PROOF_REQUEST_CEILING_MS, proverUrl, remainingBudgetMs } from './runner-env.ts'
 
 /// The HTTP boundary to the enclave's CUDA prover: the shapes it answers with
@@ -73,16 +74,16 @@ export type PreparedRoom = {
 
 export async function requestJson<T>(endpoint: string, request: unknown): Promise<T> {
   if (viaQueue()) return queueRequestJson<T>(endpoint, request)
-  const response = await fetch(`${proverUrl}${endpoint}`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(request),
-    signal: AbortSignal.timeout(Math.min(PROOF_REQUEST_CEILING_MS, remainingBudgetMs())),
-  })
+  const response = await postJsonWithDeadline(
+    proverUrl,
+    endpoint,
+    request,
+    Math.min(PROOF_REQUEST_CEILING_MS, remainingBudgetMs()),
+  )
   // Read the body once as text: the prover answers every outcome in JSON, but a
   // status code is the one field that separates a rejected request from a
   // prover-side task failure, and it must survive an unparsable body too.
-  const body = await response.text()
+  const body = response.body
   let parsed: unknown
   try {
     parsed = JSON.parse(body)
@@ -92,7 +93,7 @@ export async function requestJson<T>(endpoint: string, request: unknown): Promis
     )
   }
   const result = parsed as T & { decision?: string; reason?: string; effect?: string }
-  if (!response.ok || result.decision === 'request-rejected') {
+  if (response.status < 200 || response.status >= 300 || result.decision === 'request-rejected') {
     const reason = result.reason ?? result.effect ?? body.slice(0, 200)
     throw new Error(`the CUDA prover returned HTTP ${response.status} for ${endpoint}: ${reason}`)
   }
