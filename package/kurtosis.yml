@@ -1,0 +1,5 @@
+name: github.com/OlegJakushkin/zkdeal/kurtosis
+description: |
+  zkdeal v6 acceptance: a fresh CUDA Groth16 proof for a non-empty two-block
+  room batch is checked by the official local Ethereum verifier and committed
+  by the long-lived RoomManager.

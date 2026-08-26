@@ -1,0 +1,17 @@
+# Kurtosis CLI + Node for running the acceptance harness fully inside a
+# container (the enclave itself still runs on the host Docker engine through
+# the socket mount). No repository-history client is installed or required.
+FROM node:22-bookworm@sha256:0557ac14e0d45d02ed563067b82856ca5e7aa3437fa28d98d4350ea9c3d9494a
+ARG KURTOSIS_VERSION=1.20.0
+ARG KURTOSIS_SHA256=3866e805a83a63d3d0b177f54c3fb556066b8c0e12f6442a0579bb7deaa1d5ae
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
+ && curl -fsSL "https://github.com/kurtosis-tech/kurtosis-cli-release-artifacts/releases/download/${KURTOSIS_VERSION}/kurtosis-cli_${KURTOSIS_VERSION}_linux_amd64.tar.gz" \
+    -o /tmp/kurtosis.tgz \
+ && echo "${KURTOSIS_SHA256}  /tmp/kurtosis.tgz" | sha256sum -c - \
+ && tar -C /usr/local/bin -xzf /tmp/kurtosis.tgz kurtosis \
+ && rm /tmp/kurtosis.tgz \
+ && kurtosis version \
+ && corepack enable && corepack prepare pnpm@10.13.1 --activate \
+ && rm -rf /var/lib/apt/lists/*
+# The mounted package directory is the source boundary; analytics must not block.
+RUN kurtosis analytics disable || true

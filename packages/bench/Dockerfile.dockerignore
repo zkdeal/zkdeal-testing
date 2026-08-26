@@ -1,0 +1,27 @@
+# Context is the umbrella root; only the trees the COPY lines name matter.
+**/node_modules
+**/.git
+**/target
+prover-node/zkvm/build
+prover-node/zkvm/target
+web2-api
+app-node
+apps-examples
+book
+outputs
+output
+qa
+tmp
+.tools
+.claude
+**/*.log
+**/test-results
+**/gpu-*-evidence
+web3-protocol/contracts/cache
+web3-protocol/contracts/lib
+web3-protocol/contracts/src
+web3-protocol/contracts/test
+web3-protocol/circuits/build
+web3-protocol/circuits/cache
+web3-protocol/circuits/src
+web3-protocol/circuits/test

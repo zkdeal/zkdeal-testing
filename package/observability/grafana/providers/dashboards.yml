@@ -1,0 +1,11 @@
+# Provisioned by kurtosis/observability.star: load the checked-in dashboards
+# from the files artifact mounted at /var/lib/grafana/dashboards. UI edits are
+# disabled - the dashboards' source of truth is this repository.
+apiVersion: 1
+providers:
+  - name: zkdeal
+    type: file
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards

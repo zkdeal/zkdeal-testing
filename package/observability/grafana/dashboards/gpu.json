@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 39,
+  "title": "CUDA prover",
+  "uid": "zkdeal-gpu",
+  "editable": false,
+  "refresh": "10s",
+  "time": { "from": "now-30m", "to": "now" },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "GPU utilization (%)",
+      "description": "Device utilization from the prover's probe; the probe caches for 2 s, so steps shorter than that are invisible by design.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [{ "expr": "zkdeal_prover_gpu_utilization_percent", "refId": "A" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "GPU memory used (MiB)",
+      "description": "Device memory in use. A segment too large for the card shows here as a climb toward the VRAM ceiling before the Groth16 wrap OOMs.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [{ "expr": "zkdeal_prover_gpu_memory_used_mib", "refId": "A" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "GPU power (W)",
+      "description": "Board power draw; sustained near the card's limit is expected during a proof.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [{ "expr": "zkdeal_prover_gpu_power_watts", "refId": "A" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Requests by route and outcome",
+      "description": "Prover HTTP requests split by route and outcome; a rising failure outcome is the first sign of a sick prover.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        { "expr": "sum by (route,outcome)(zkdeal_prover_requests_total)", "refId": "A" }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Prover uptime (s)",
+      "description": "Seconds since the prover process started; a reset means the service restarted.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 },
+      "targets": [{ "expr": "zkdeal_prover_uptime_seconds", "refId": "A" }]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 39,
+  "title": "zkdeal proving pipeline",
+  "uid": "zkdeal-proving",
+  "editable": false,
+  "refresh": "10s",
+  "time": { "from": "now-30m", "to": "now" },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Queue depth",
+      "description": "Jobs waiting versus active in the shared prove queue. Waiting above zero while active is zero means no agent is leasing.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "zkdeal_queue_jobs_waiting", "refId": "A" },
+        { "expr": "zkdeal_queue_jobs_active", "refId": "B" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Jobs done per node",
+      "description": "Completed jobs by queue node - on this stand a single series for the one CUDA prover's agent.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [{ "expr": "zkdeal_queue_node_jobs_done", "refId": "A" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Proving slot occupancy",
+      "description": "The coordinator's ProvingSlot: the active occupant and the observable waiters serialized behind it.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "zkdeal_proving_slot_active", "refId": "A" },
+        { "expr": "zkdeal_proving_slot_waiting", "refId": "B" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Average proof seconds (5m)",
+      "description": "Mean end-to-end proof latency over the trailing five minutes, from the coordinator's proof-seconds histogram.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "rate(zkdeal_demo_proof_seconds_sum[5m]) / rate(zkdeal_demo_proof_seconds_count[5m])",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Rooms",
+      "description": "Rooms the coordinator currently hosts.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 },
+      "targets": [{ "expr": "zkdeal_demo_rooms", "refId": "A" }]
+    },
+    {
+      "type": "stat",
+      "title": "SSE subscribers",
+      "description": "Live event-stream subscribers; updates to them are coalesced on the 500 ms batching floor.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 },
+      "targets": [{ "expr": "zkdeal_sse_subscribers", "refId": "A" }]
+    },
+    {
+      "type": "stat",
+      "title": "Checkpoints total",
+      "description": "Checkpoints the coordinator has committed to L1 since it started.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
+      "targets": [{ "expr": "zkdeal_demo_checkpoints_total", "refId": "A" }]
+    }
+  ]
+}

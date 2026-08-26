@@ -1,0 +1,36 @@
+# Test the acceptance harness itself, and run the full enclave from a container.
+#   docker compose run --rm guards-test   # workflow guard + scripts unit tests
+#   docker compose run --rm bench-test    # @zkdeal/bench unit tests
+#   docker compose --profile e2e run --rm e2e   # full kurtosis acceptance run
+#
+# The e2e service drives the host Docker daemon through the socket mount; the
+# Kurtosis CLI inside it starts the enclave on the host engine. The host-native
+# CLI path (scripts/run-kurtosis-test.sh directly) remains equally supported.
+services:
+  guards-test:
+    image: node:22-bookworm
+    volumes:
+      - ..:/src:ro
+      - pnpm-store:/pnpm-store
+    command: bash -lc "mkdir /u && tar -C /src --exclude='./*/node_modules' --exclude='./*/*/node_modules' --exclude='./*/*/*/node_modules' --exclude=./.git -cf - ./kurtosis-testing ./.github ./prover-node/zkvm/lock-schema.mjs ./prover-node/zkvm/artifacts.lock.json ./web3-protocol/contracts/foundry-image.txt ./web3-protocol/.env ./apps-examples/.env | tar -C /u -xf - && cd /u/kurtosis-testing && corepack enable && corepack prepare pnpm@10.13.1 --activate && pnpm config set store-dir /pnpm-store && pnpm install --frozen-lockfile && pnpm run check:gpu-workflows && pnpm run test:scripts"
+
+  bench-test:
+    image: node:22-bookworm
+    volumes:
+      - ..:/src:ro
+      - pnpm-store:/pnpm-store
+    command: bash -lc "mkdir /u && tar -C /src --exclude='./*/node_modules' --exclude='./*/*/node_modules' --exclude='./*/*/*/node_modules' --exclude=./.git -cf - ./kurtosis-testing ./web3-protocol ./prover-node/zkvm/fixtures ./prover-node/zkvm/artifacts.lock.json ./prover-node/zkvm/lock-schema.mjs | tar -C /u -xf - && cd /u/kurtosis-testing && corepack enable && corepack prepare pnpm@10.13.1 --activate && pnpm config set store-dir /pnpm-store && pnpm install --frozen-lockfile && pnpm -r run build && pnpm -r run test"
+
+  e2e:
+    profiles: [e2e]
+    build:
+      context: .
+      dockerfile: Dockerfile.kurtosis-cli
+    working_dir: /umbrella/kurtosis-testing
+    volumes:
+      - ..:/umbrella
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: bash scripts/run-kurtosis-test.sh
+
+volumes:
+  pnpm-store:

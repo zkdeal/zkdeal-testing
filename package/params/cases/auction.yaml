@@ -1,0 +1,27 @@
+# Template only. `pnpm demo:start` writes a generated READY file with concrete
+# local image references and the current single-GPU identity.
+status: NOT_RUN
+protocol_version: 6
+runner_timeout: 45m
+# Which example case this template drives; base is the bootstrap acceptance
+# alone. Every non-base case (see params/cases/) also checkpoints its example
+# rooms through the demo plane and gates on fee + queue evidence.
+case: auction
+# Prover segment size: "20" fits a 24 GB card; an 8 GB card needs "18"-"19"
+# to leave room for the Groth16 wrap.
+segment_po2: "20"
+proof_samples: "3"
+prove_queue: true
+example_timeout: 40m
+gpu_name: CURRENT_GPU_NOT_MEASURED
+public_host: "127.0.0.1"
+tls_enabled: true
+# Optional: explorer_url. The package normally publishes its browser-correct
+# `explorer` service at http://<public_host>:3200. Set this only when an operator
+# deliberately fronts that service with another public proxy.
+images:
+  prover: NOT_BUILT
+  runner: NOT_BUILT
+  server: NOT_BUILT
+  geth: ethereum/client-go:v1.17.3@sha256:ee8af3a081fd8f780509541cf8115be03259e106375e50efa9d995400f86e15d
+  lighthouse: sigp/lighthouse:v8.1.3@sha256:44aa773dcf274122c32cc41c4dae7124ed3cab5c267ee82174c6dfd9c688da96

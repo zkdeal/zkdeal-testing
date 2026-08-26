@@ -1,0 +1,11 @@
+# Provisioned by kurtosis/observability.star: the enclave's one Prometheus,
+# addressed by its in-enclave service name. The fixed uid is what every
+# checked-in dashboard's panels reference.
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true

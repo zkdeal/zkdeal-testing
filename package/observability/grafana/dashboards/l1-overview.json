@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 39,
+  "title": "L1 overview",
+  "uid": "zkdeal-l1",
+  "editable": false,
+  "refresh": "10s",
+  "time": { "from": "now-30m", "to": "now" },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "L1 head block",
+      "description": "geth execution head gauge (chain_head_block via /debug/metrics/prometheus). Metric names in this dashboard are the expected geth exposition names; they get finalized from the live scrape of this stand.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+      "targets": [{ "expr": "chain_head_block", "refId": "A" }]
+    },
+    {
+      "type": "stat",
+      "title": "Execution peers",
+      "description": "geth p2p peer count (p2p_peers). On this single-participant devnet anything above zero means the node is not isolated.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+      "targets": [{ "expr": "p2p_peers", "refId": "A" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Execution throughput (Mgas/s)",
+      "description": "chain_mgasps - geth's own mega-gas-per-second gauge, confirmed against the live scrape of this stand (the earlier guessed counter name did not exist).",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [{ "expr": "chain_mgasps", "refId": "A" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Beacon head slot",
+      "description": "Lighthouse beacon head slot (beacon_head_slot). On the 12-second devnet this should climb one slot every 12 s; a flat line means the chain has stalled.",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "targets": [{ "expr": "beacon_head_slot", "refId": "A" }]
+    }
+  ]
+}

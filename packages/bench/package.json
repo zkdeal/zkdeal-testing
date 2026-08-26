@@ -1,0 +1,24 @@
+{
+  "name": "@zkdeal/bench",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "zkdeal long-lived-room acceptance and capacity evidence",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts",
+    "kurtosis:run": "tsx src/kurtosis-runner.ts",
+    "validate": "tsx src/validate.ts",
+    "example": "tsx src/example-runner.ts",
+    "validate:example": "tsx src/validate-example.ts",
+    "mint:fixture": "tsx src/mint-real-proof-fixture.ts"
+  },
+  "dependencies": {
+    "viem": "^2.55.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.23.1",
+    "typescript": "^5.9.3"
+  }
+}
