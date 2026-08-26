@@ -1,6 +1,6 @@
 # PUBLIC TEMPLATE - run the full observable zkdeal simulation purely from
-# published Docker Hub images. No source checkout of the private repos and no
-# local image build is needed; only this kurtosis-testing package.
+# published Docker Hub images. No sibling source checkout or local image build
+# is needed; only this public zkdeal-testing package.
 #
 # How to run:
 #   1. Copy this file to params/public.generated.yaml (the *.generated.yaml
@@ -8,8 +8,10 @@
 #   2. In the copy set `status: READY` and set `gpu_name` to the exact name
 #      `nvidia-smi --query-gpu=name --format=csv,noheader` reports; the
 #      package refuses templates and unmeasured GPU identities by design.
-#   3. Confirm the prover/runner/server digests below were filled by a
-#      publication run. `REPLACE-AT-PUBLISH` means not published yet.
+#   3. Keep the digest-pinned defaults below on a Hopper or Blackwell GPU. The
+#      sm90 image contains forward-compatible compute_90 PTX and has completed
+#      the B200 acceptance run; choose another published architecture image
+#      only when your measured device requires it.
 #   4. One-line run:
 #      kurtosis run ./package/kurtosis.yml --args-file package/params/public.generated.yaml --enclave zkdeal-public --image-download missing
 #
@@ -45,8 +47,8 @@ tls_enabled: true
 # `explorer` service at http://<public_host>:3200. Set this only when an
 # operator deliberately fronts that service with another public proxy.
 images:
-  prover: docker.io/zkdeal/prover-cuda:sm120@sha256:REPLACE-AT-PUBLISH
-  runner: docker.io/zkdeal/coordinator:20260822-5090rc@sha256:REPLACE-AT-PUBLISH
-  server: docker.io/zkdeal/coordinator:20260822-5090rc@sha256:REPLACE-AT-PUBLISH
+  prover: docker.io/zkdeal/prover-cuda:sm90@sha256:1bf1ea8937fc0af3de88ad3708dee85d927d8e31ac90d0d631a13c0a5adbad19
+  runner: docker.io/zkdeal/coordinator:20260827-coldproof-261448b37a59-d34a7fbfabdc@sha256:f892cb3cee19040ccd5adf10b6b9bc8d4b1826beda9a808aa76f632833919d7b
+  server: docker.io/zkdeal/coordinator:20260827-coldproof-261448b37a59-d34a7fbfabdc@sha256:f892cb3cee19040ccd5adf10b6b9bc8d4b1826beda9a808aa76f632833919d7b
   geth: ethereum/client-go:v1.17.3@sha256:ee8af3a081fd8f780509541cf8115be03259e106375e50efa9d995400f86e15d
   lighthouse: sigp/lighthouse:v8.1.3@sha256:44aa773dcf274122c32cc41c4dae7124ed3cab5c267ee82174c6dfd9c688da96

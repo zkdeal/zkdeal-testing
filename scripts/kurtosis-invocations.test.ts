@@ -40,4 +40,19 @@ describe('user-facing Kurtosis invocations', () => {
     const template = readFileSync(resolve(repoRoot, 'package/params/public.yaml'), 'utf8')
     expect(template).toContain('kurtosis run ./package/kurtosis.yml --args-file')
   })
+
+  test('the public template contains only digest-pinned published images', () => {
+    const template = readFileSync(resolve(repoRoot, 'package/params/public.yaml'), 'utf8')
+    expect(template).not.toMatch(/REPLACE-AT-PUBLISH|NOT_BUILT/)
+    const images = Object.fromEntries(
+      [...template.matchAll(/^  (prover|runner|server): (\S+)$/gm)].map((match) => [
+        match[1],
+        match[2],
+      ]),
+    )
+    for (const key of ['prover', 'runner', 'server']) {
+      expect(images[key]).toMatch(/@sha256:[0-9a-f]{64}$/)
+    }
+    expect(images.runner).toBe(images.server)
+  })
 })
