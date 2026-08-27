@@ -712,7 +712,8 @@ def _start_demo(
         "ACCESS_TOKEN": addresses["token"],
         "MANAGED_ROOM_NODE_ID": "0x529edf13d89f65e2c86e86911db719ca7bf50338d408066d96eac658474dac7b",
         "MANAGED_ROOM_SLOT_ID": "0x9005d7936b05e94bf881acdb1985b78190bb23372d915ac96c9a51d9938defa9",
-        "MANAGED_ROOM_PRESET_ID": "0xcd2e6acc7f063347942b311bf03db5b29af6311964e856a55ac6fb17aa1597f8",
+        # keccak256("kurtosis-v6-preset"), registered by pool-lifecycle.ts.
+        "MANAGED_ROOM_PRESET_ID": "0x5573b9e025aca61180407c84fb878ea7986ad7a0d1e77ff13f3ad49f888628dd",
         "MANAGED_ROOM_PARTICIPANT_CAPACITY": "128",
         "MANAGED_ROOM_NODE_LABEL": "%s proof node" % gpu_name,
         "MANAGED_ROOM_SLOT_LABEL": "Flexible deadline · one ready room",

@@ -87,6 +87,17 @@ describe('user-facing Kurtosis invocations', () => {
     expect(runnerSource).toContain('The coordinator owns its')
   })
 
+  test('the managed-room card advertises the preset registered by the v6 bootstrap', () => {
+    const packageSource = readFileSync(resolve(repoRoot, 'package/main.star'), 'utf8')
+    const registeredV6Preset =
+      '0x5573b9e025aca61180407c84fb878ea7986ad7a0d1e77ff13f3ad49f888628dd'
+
+    expect(packageSource).toContain(`"MANAGED_ROOM_PRESET_ID": "${registeredV6Preset}"`)
+    expect(packageSource).not.toContain(
+      '0xcd2e6acc7f063347942b311bf03db5b29af6311964e856a55ac6fb17aa1597f8',
+    )
+  })
+
   test('the public template contains only digest-pinned published images', () => {
     const template = readFileSync(resolve(repoRoot, 'package/params/public.yaml'), 'utf8')
     expect(template).not.toMatch(/REPLACE-AT-PUBLISH|NOT_BUILT/)
