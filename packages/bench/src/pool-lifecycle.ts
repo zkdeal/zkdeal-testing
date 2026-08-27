@@ -92,6 +92,10 @@ export async function configurePool(
     'registerPreset',
     [presetId, journal.coldTemplateId, journal.policyHash],
   )
+  const heartbeatTimeoutBlocks = await poolRead<bigint>('MIN_HEARTBEAT_TIMEOUT_BLOCKS')
+  if (heartbeatTimeoutBlocks <= 0n) {
+    throw new Error('the room pool published no usable heartbeat timeout floor')
+  }
   await sent(
     wallets.nodeAdmin,
     pool,
@@ -102,7 +106,9 @@ export async function configurePool(
       accounts.service.address,
       zeroAddress,
       keccak256(toBytes('kurtosis-node-metadata')),
-      20n,
+      // Read the deployed protocol floor instead of duplicating a value that
+      // can change when its reorg and inclusion margin is recalibrated.
+      heartbeatTimeoutBlocks,
     ],
   )
   // The slot advertises what this GPU actually delivered plus the stated
