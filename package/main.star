@@ -18,16 +18,8 @@
 DEV_FUNDER_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 DEV_FUNDER_MNEMONIC = "test test test test test test test test test test test junk"
 
-# The coordinator refuses to start with ADMISSION_KEY set but no token: the
-# admission endpoint makes the operator key sign receipts that commit the room's
-# service bond, so it authenticates every caller. The token is operator-only --
-# it is never published through /config and never reaches a browser, so the demo
-# UI is unaffected. This value is a well-known local-devnet credential of exactly
-# the same standing as DEV_FUNDER_KEY above; a real deployment must supply its
-# own. Minimum accepted length is 16 characters (server/src/config.ts).
-DEMO_ADMISSION_TOKEN = "zkdeal-local-devnet-admission-token"
-# Local-devnet queue credentials of the same standing as the admission token
-# above; a real deployment must supply its own.
+# Well-known local-devnet queue credentials; a real deployment must supply its
+# own scoped values.
 QUEUE_SUBMIT_TOKEN = "zkdeal-local-devnet-queue-submit-token"
 QUEUE_NODE_TOKEN = "zkdeal-local-devnet-queue-node-token"
 QUEUE_PORT = 3005
@@ -732,13 +724,10 @@ def _start_demo(
         # /demo/v1/system, and a visitor who is on the https origin must not be
         # pointed back at an http one.
         "DEMO_API_URL": demo_api_url,
-        "ADMISSION_KEY": ROLE_SERVICE_KEY,
-        # This package always creates its own chain-31337 devnet immediately
-        # above. The coordinator deliberately refuses a raw operator private
-        # key unless that exact development escape is explicit; production
-        # deployments never inherit this environment.
-        "ADMISSION_DEV_PRIVATE_KEY": "1",
-        "ADMISSION_TOKEN": DEMO_ADMISSION_TOKEN,
+        # The browser-facing coordinator never receives the node-service
+        # private key. Demo room construction derives the same public service
+        # account inside DemoLiveRuntime; any deployment that needs admission
+        # receipts must add the remote signer boundary instead.
         "ALLOW_UNSIGNED_WRITES": "0",
         "DATA_DIR": "/app/web2-api/server/data",
         "WEB_ROOT": "/app/web2-api/web/out",
