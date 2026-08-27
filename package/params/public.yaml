@@ -47,7 +47,7 @@ tls_enabled: true
 # `explorer` service at http://<public_host>:3200. Set this only when an
 # operator deliberately fronts that service with another public proxy.
 images:
-  prover: docker.io/zkdeal/prover-cuda:sm100-6aff7be-20260827@sha256:ca96d3dc72531ea0126d3ce97657cb4bdba9f0b8eeb4a86edc9cd5ba6dba6164
+  prover: docker.io/zkdeal/prover-cuda:sm100-3afe132-20260827@sha256:9ed61ae0ccaba9526f9384b654512a3705ddc927768c8b63096e21a3c039dc59
   runner: docker.io/zkdeal/coordinator:20260827-timelock-ef3880f@sha256:5c8d843bafecfc3309aafb9fd0b8dc4990be8227df5a28aeb9edc7cac7b0d2f3
   server: docker.io/zkdeal/coordinator:20260827-timelock-ef3880f@sha256:5c8d843bafecfc3309aafb9fd0b8dc4990be8227df5a28aeb9edc7cac7b0d2f3
   geth: ethereum/client-go:v1.17.3@sha256:ee8af3a081fd8f780509541cf8115be03259e106375e50efa9d995400f86e15d
