@@ -188,7 +188,7 @@ type PresetEvidence = {
 }
 
 /** One preset, start to finish: template → room → deploy → scripted actions →
- * checkpoint → L1_ACCEPTED, returning the identifiers the evidence publishes. */
+ * checkpoint → L1_FINALIZED, returning the identifiers the evidence publishes. */
 async function drivePreset(presetId: string): Promise<PresetEvidence> {
   const { presets } = await demoRequest<{ presets: DemoPresetView[] }>('GET', '/demo/v1/presets')
   const preset = presets.find((item) => item.id === presetId)
@@ -276,9 +276,9 @@ async function drivePreset(presetId: string): Promise<PresetEvidence> {
   )
   await waitForJob(checkpointJob.id, `checkpointing the ${presetId} room`)
   const settled = await demoRequest<DemoRoomView>('GET', `/demo/v1/rooms/${opened.id}`)
-  if (settled.phase !== 'L1_ACCEPTED' || !settled.checkpoint) {
+  if (settled.phase !== 'L1_FINALIZED' || !settled.checkpoint) {
     throw new Error(
-      `the ${presetId} room finished in ${settled.phase} without an accepted checkpoint`,
+      `the ${presetId} room finished in ${settled.phase} without a finalized checkpoint`,
     )
   }
   // `l1TransactionHash` is exempt from the response redaction exactly so a

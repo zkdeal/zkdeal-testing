@@ -98,6 +98,17 @@ describe('user-facing Kurtosis invocations', () => {
     )
   })
 
+  test('the example runner accepts only the coordinator final checkpoint phase', () => {
+    const runnerSource = readFileSync(
+      resolve(repoRoot, 'packages/bench/src/example-runner.ts'),
+      'utf8',
+    )
+
+    expect(runnerSource).toContain("settled.phase !== 'L1_FINALIZED'")
+    expect(runnerSource).toContain('without a finalized checkpoint')
+    expect(runnerSource).not.toContain('L1_ACCEPTED')
+  })
+
   test('the public template contains only digest-pinned published images', () => {
     const template = readFileSync(resolve(repoRoot, 'package/params/public.yaml'), 'utf8')
     expect(template).not.toMatch(/REPLACE-AT-PUBLISH|NOT_BUILT/)
