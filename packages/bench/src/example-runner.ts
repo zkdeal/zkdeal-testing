@@ -55,10 +55,6 @@ const SYSTEM_READY_TIMEOUT_MS = 3 * 60_000
 // miss the whole next one. Cover a full missed interval plus L1 inclusion.
 const HEARTBEAT_WINDOW_MS = 150_000
 const HEARTBEAT_POLL_INTERVAL_MS = 5_000
-// L1 inclusion allowance an example room asks for. 40 blocks is 480 s at 12 s
-// blocks - comfortably above a slow-stand checkpoint (a ~73 s proof plus the
-// queue round-trip) and under the coordinator's 600 s / 50-block ceiling.
-const EXAMPLE_ROOM_DEADLINE_BLOCKS = 40
 const DEPOSIT_WEI = parseEther('0.1')
 const TRANSACTION_HASH = /^0x[0-9a-fA-F]{64}$/
 
@@ -235,17 +231,12 @@ async function drivePreset(presetId: string): Promise<PresetEvidence> {
 
   progress(`Opening and deploying the ${presetId} room.`)
   const opened = await demoRequest<DemoRoomView>('POST', '/demo/v1/rooms', {
-    // The default L1 inclusion allowance is tuned to a 4090 (~17 s room
-    // proof, 7 blocks). This runner also drives 8 GB stands where a proof is
-    // ~4x slower and the queue round-trip adds latency, so a checkpoint's
-    // submitBatch would race a 7-block deadline and revert. Ask for the
-    // generous end of the accepted range (well under the 600 s ceiling) so
-    // the acceptance measures whether a proof LANDS, not whether this
-    // particular card is fast.
+    // Do not restate the checkpoint policy here. The coordinator owns its
+    // measured proof, inclusion, reorg and full-retry allowance and publishes
+    // the preset-specific default through /demo/v1/room-settings.
     body: {
       name: `Example ${presetId} room`,
       templateId: template.id,
-      deadlineBlocksFromStart: EXAMPLE_ROOM_DEADLINE_BLOCKS,
     },
     idempotencyKey: idempotencyKey(`${presetId}-room`),
   })

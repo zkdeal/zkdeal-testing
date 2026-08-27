@@ -76,6 +76,17 @@ describe('user-facing Kurtosis invocations', () => {
     expect(relaySource).toContain("L1_RPC_URL: `http://${LOOPBACK_HOST}:${LOOPBACK_PORT}`")
   })
 
+  test('the example runner uses the coordinator-published checkpoint allowance', () => {
+    const runnerSource = readFileSync(
+      resolve(repoRoot, 'packages/bench/src/example-runner.ts'),
+      'utf8',
+    )
+
+    expect(runnerSource).not.toContain('EXAMPLE_ROOM_DEADLINE_BLOCKS')
+    expect(runnerSource).not.toContain('deadlineBlocksFromStart:')
+    expect(runnerSource).toContain('The coordinator owns its')
+  })
+
   test('the public template contains only digest-pinned published images', () => {
     const template = readFileSync(resolve(repoRoot, 'package/params/public.yaml'), 'utf8')
     expect(template).not.toMatch(/REPLACE-AT-PUBLISH|NOT_BUILT/)
