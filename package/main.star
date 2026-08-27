@@ -425,9 +425,9 @@ def _start_agent(plan, image, prover_url, queue_url, l1_rpc, pool):
     """The queue-pull sidecar for the enclave's one CUDA prover.
 
     It leases only when the local prover is healthy and idle, forwards the job,
-    and reports the result; with NODE_SERVICE_KEY set it also sends the room
-    pool's on-chain heartbeat from the registered service account, which is the
-    liveness evidence the example runner asserts.
+    and reports the result. The package's chain-31337-only entrypoint gives the
+    agent a loopback RPC relay for its development heartbeat; the relay verifies
+    the upstream chain before the process holding the development key starts.
     """
     plan.add_service(
         name="prover-agent",
@@ -436,16 +436,17 @@ def _start_agent(plan, image, prover_url, queue_url, l1_rpc, pool):
             cmd=[
                 "sh",
                 "-c",
-                "cd /app/prover-node/agent && pnpm exec tsx src/agent.ts",
+                "cd /app/kurtosis-testing/packages/bench && pnpm exec tsx src/devnet-prover-agent.ts",
             ],
             env_vars={
                 "PROVER_URL": prover_url,
                 "QUEUE_URL": queue_url,
                 "ZKDEAL_QUEUE_NODE_TOKEN": QUEUE_NODE_TOKEN,
                 "NODE_ID": POOL_NODE_ID,
-                "NODE_SERVICE_KEY": ROLE_SERVICE_KEY,
+                "NODE_LIVENESS_DEV_MODE": "true",
+                "NODE_LIVENESS_DEV_PRIVATE_KEY": ROLE_SERVICE_KEY,
                 "ROOM_POOL": pool,
-                "L1_RPC_URL": l1_rpc,
+                "DEVNET_L1_RPC_UPSTREAM": l1_rpc,
             },
         ),
     )

@@ -56,6 +56,26 @@ describe('user-facing Kurtosis invocations', () => {
     expect(demoStart).not.toContain('"ADMISSION_TOKEN"')
   })
 
+  test('the prover agent confines its dev key behind a chain-31337 loopback relay', () => {
+    const packageSource = readFileSync(resolve(repoRoot, 'package/main.star'), 'utf8')
+    const agentStart = packageSource.slice(
+      packageSource.indexOf('def _start_agent('),
+      packageSource.indexOf('def _run_example_case('),
+    )
+    const relaySource = readFileSync(
+      resolve(repoRoot, 'packages/bench/src/devnet-prover-agent.ts'),
+      'utf8',
+    )
+
+    expect(agentStart).not.toContain('"NODE_SERVICE_KEY"')
+    expect(agentStart).toContain('"NODE_LIVENESS_DEV_MODE": "true"')
+    expect(agentStart).toContain('"NODE_LIVENESS_DEV_PRIVATE_KEY": ROLE_SERVICE_KEY')
+    expect(agentStart).toContain('"DEVNET_L1_RPC_UPSTREAM": l1_rpc')
+    expect(relaySource).toContain("const DEV_CHAIN_ID = 31_337n")
+    expect(relaySource).toContain("server.listen(LOOPBACK_PORT, LOOPBACK_HOST")
+    expect(relaySource).toContain("L1_RPC_URL: `http://${LOOPBACK_HOST}:${LOOPBACK_PORT}`")
+  })
+
   test('the public template contains only digest-pinned published images', () => {
     const template = readFileSync(resolve(repoRoot, 'package/params/public.yaml'), 'utf8')
     expect(template).not.toMatch(/REPLACE-AT-PUBLISH|NOT_BUILT/)
