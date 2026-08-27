@@ -347,6 +347,11 @@ def _start_prover(plan, image, segment_po2):
                 "RISC0_PROVER": "local",
                 "RISC0_REQUIRE_CUDA": "1",
                 "CUDA_VISIBLE_DEVICES": "0",
+                # Every published architecture tag must contain native cubins
+                # for the selected GPU. Disabling PTX JIT turns an accidental
+                # cross-architecture pin into an immediate, honest failure
+                # instead of a many-minute first-proof compilation stall.
+                "CUDA_DISABLE_PTX_JIT": "1",
                 # Tunable per stand: 20 fits a 24 GB card; an 8 GB card (the
                 # RTX 3080 laptop stand) needs 18-19 to leave room for the
                 # Groth16 wrap.

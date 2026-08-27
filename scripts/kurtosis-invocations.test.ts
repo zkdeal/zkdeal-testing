@@ -41,6 +41,11 @@ describe('user-facing Kurtosis invocations', () => {
     expect(template).toContain('kurtosis run ./package/kurtosis.yml --args-file')
   })
 
+  test('the public stack rejects PTX fallback compilation', () => {
+    const packageSource = readFileSync(resolve(repoRoot, 'package/main.star'), 'utf8')
+    expect(packageSource).toContain('"CUDA_DISABLE_PTX_JIT": "1"')
+  })
+
   test('the public template contains only digest-pinned published images', () => {
     const template = readFileSync(resolve(repoRoot, 'package/params/public.yaml'), 'utf8')
     expect(template).not.toMatch(/REPLACE-AT-PUBLISH|NOT_BUILT/)

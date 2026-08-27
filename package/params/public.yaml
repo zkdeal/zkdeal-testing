@@ -8,10 +8,10 @@
 #   2. In the copy set `status: READY` and set `gpu_name` to the exact name
 #      `nvidia-smi --query-gpu=name --format=csv,noheader` reports; the
 #      package refuses templates and unmeasured GPU identities by design.
-#   3. Keep the digest-pinned defaults below on a Hopper or Blackwell GPU. The
-#      sm90 image contains forward-compatible compute_90 PTX and has completed
-#      the B200 acceptance run; choose another published architecture image
-#      only when your measured device requires it.
+#   3. Keep the digest-pinned defaults below on a B200 (compute capability
+#      10.0). The package disables PTX JIT, so another GPU must use its matching
+#      published architecture image rather than compiling a fallback at first
+#      proof.
 #   4. One-line run:
 #      kurtosis run ./package/kurtosis.yml --args-file package/params/public.generated.yaml --enclave zkdeal-public --image-download missing
 #
@@ -47,7 +47,7 @@ tls_enabled: true
 # `explorer` service at http://<public_host>:3200. Set this only when an
 # operator deliberately fronts that service with another public proxy.
 images:
-  prover: docker.io/zkdeal/prover-cuda:sm90@sha256:1bf1ea8937fc0af3de88ad3708dee85d927d8e31ac90d0d631a13c0a5adbad19
+  prover: docker.io/zkdeal/prover-cuda:sm100-6aff7be-20260827@sha256:ca96d3dc72531ea0126d3ce97657cb4bdba9f0b8eeb4a86edc9cd5ba6dba6164
   runner: docker.io/zkdeal/coordinator:20260827-coldproof-261448b37a59-d34a7fbfabdc@sha256:f892cb3cee19040ccd5adf10b6b9bc8d4b1826beda9a808aa76f632833919d7b
   server: docker.io/zkdeal/coordinator:20260827-coldproof-261448b37a59-d34a7fbfabdc@sha256:f892cb3cee19040ccd5adf10b6b9bc8d4b1826beda9a808aa76f632833919d7b
   geth: ethereum/client-go:v1.17.3@sha256:ee8af3a081fd8f780509541cf8115be03259e106375e50efa9d995400f86e15d
