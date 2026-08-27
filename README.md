@@ -20,10 +20,40 @@ benchmark matrix that must never become a push gate.
 path keeps these properties - the required workflow shape, the CUDA-only
 package, the enclave-preserving runner pair.
 
-Honesty note: the full end-to-end run has not yet been executed green on the
-current split layout on this machine. Treat `e2e` as the acceptance target
-the folder defines, not as an established local result; the dated evidence
-that does exist is linked from `book/docs/status/`.
+Evidence note: a clean public-layout run at testing commit
+`c791adf192a014d42087983cd644de3bfaac126e` and prover commit
+`d60547ba7e040d2ba77bd154bb6e20c10d276657` completed on 27 August 2026 on an
+NVIDIA B200: cold bootstrap, a one-shot room, a two-checkpoint continuing
+room, L1 finality, and Blockscout indexing. Treat this as source-bound
+acceptance evidence, not a public-testnet, production, benchmark, security,
+or general hardware-support claim.
+
+## Motivational example
+
+A receipt proves inclusion, not finality, and says nothing about explorer
+visibility. Publishable acceptance evidence therefore checks two independent
+questions: does Ethereum's finalized view retain the same block hash, and does
+Blockscout index that same transaction, manager, block number, and block hash?
+
+This run downloads the enclave's evidence, validates it with the shipped bench
+validator, and independently asks Blockscout for both the transaction and its
+canonical block. It passes only when all three views agree.
+
+[![A terminal validates a checkpoint as FINALIZED and confirms that Blockscout indexes the same transaction and canonical block hash.](https://zkdeal.org/blog/terminal/i-public-checkout-and-gates-poster.png?v=38f23243c0f4)](https://zkdeal.org/blog/more-than-a-transaction-less-than-a-chain/#terminal-recording)
+
+**Watch or inspect the run:** [interactive Asciinema recording](https://zkdeal.org/blog/more-than-a-transaction-less-than-a-chain/#terminal-recording) · [copyable transcript](https://zkdeal.org/blog/terminal/i-public-checkout-and-gates.txt) · [Asciicast v3](https://zkdeal.org/blog/terminal/i-public-checkout-and-gates.cast) · [VHS tape](https://zkdeal.org/blog/terminal/i-public-checkout-and-gates.tape) · [WebM](https://zkdeal.org/blog/terminal/i-public-checkout-and-gates.webm) · [MP4](https://zkdeal.org/blog/terminal/i-public-checkout-and-gates.mp4)
+
+The linked tutorial uses the digest-pinned public Kurtosis path. The legacy
+Compose `e2e` wrapper below remains a developer target; it is not the command
+used for this B200 result. The validated evidence path ultimately emits:
+
+```text
+{"decision":"VERIFIED","imageIdPresent":true,"journalHashComplete":true,"transactionComplete":true,"managerComplete":true,"finality":"FINALIZED","blockHashComplete":true}
+{"indexed":true,"success":true,"managerMatches":true,"blockMatches":true}
+{"indexed":true,"hashMatches":true}
+```
+
+[Run the complete explorer-verification tutorial](https://zkdeal.org/blog/more-than-a-transaction-less-than-a-chain/) or inspect the [evidence validator](packages/bench/src/evidence.ts).
 
 ## Quickstart
 
