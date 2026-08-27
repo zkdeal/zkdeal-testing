@@ -97,6 +97,9 @@ export async function deployStack(
   const poolArtifact = await artifact(
     'web3-protocol/contracts/out/RoomPoolManager.sol/RoomPoolManager.json',
   )
+  const hostingFacetArtifact = await artifact(
+    'web3-protocol/contracts/out/RoomPoolHostingFacet.sol/RoomPoolHostingFacet.json',
+  )
   // The acceptance network is an ephemeral chain that cannot wait out the
   // protocol timelock's enforced 48-hour Stage-1 floor. Use the same explicit
   // dev-rig escape as Deploy.s.sol: a stock OpenZeppelin timelock with a zero
@@ -151,6 +154,7 @@ export async function deployStack(
     0,
   ])
   const token = await deployProxy(tokenArtifact, [accounts.treasury.address, timelock])
+  const hostingFacet = await deploy(hostingFacetArtifact)
   const pool = await deployProxy(poolArtifact, [
     token,
     manager,
@@ -166,6 +170,18 @@ export async function deployStack(
     wallets.governance,
     timelock,
     timelockArtifact.abi,
+  )
+
+  // The manager's hosted-room entry points are deliberately thin delegatecall
+  // routers. Configure the code-hash-pinned public facet before probing those
+  // entry points, otherwise every call stops at the manager's missing-facet
+  // guard and never exercises the facet's pause or lifecycle checks.
+  await throughTimelock(
+    pool,
+    poolArtifact.abi,
+    'configureHostingFacet',
+    [hostingFacet],
+    'pool-hosting-facet',
   )
 
   await throughTimelock(
@@ -268,6 +284,7 @@ export async function deployStack(
     intakeFacetArtifact,
     tokenArtifact,
     poolArtifact,
+    hostingFacetArtifact,
     upstream,
     adapter,
     intakeFacet,
@@ -280,6 +297,7 @@ export async function deployStack(
     vault,
     manager,
     token,
+    hostingFacet,
     pool,
     registerReceipt,
   }
