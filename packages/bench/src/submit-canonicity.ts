@@ -25,6 +25,11 @@ function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+function isFinalizedCheckpointStarting(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error)
+  return message.toLowerCase().includes('finalized block not found')
+}
+
 /**
  * Re-read a submitted transaction at publication time and bind the evidence to
  * both its canonical block and Ethereum's finalized checkpoint. A receipt from
@@ -53,9 +58,8 @@ export async function captureSubmitCanonicity(
       throw new Error('the accepted submit transaction moved to a different L1 block after a reorg')
     }
 
-    const [canonicalBlock, finalized, headBlock] = await Promise.all([
+    const [canonicalBlock, headBlock] = await Promise.all([
       client.getBlock({ blockNumber: refreshed.blockNumber, includeTransactions: false }),
-      client.getBlock({ blockTag: 'finalized', includeTransactions: false }),
       client.getBlockNumber({ cacheTime: 0 }),
     ])
     if (
@@ -63,6 +67,20 @@ export async function captureSubmitCanonicity(
       canonicalBlock.hash.toLowerCase() !== refreshed.blockHash.toLowerCase()
     ) {
       throw new Error('the accepted submit transaction block is no longer canonical')
+    }
+    let finalized
+    try {
+      finalized = await client.getBlock({ blockTag: 'finalized', includeTransactions: false })
+    } catch (error: unknown) {
+      // A fresh post-Merge devnet legitimately has no finalized tag until its
+      // first two epochs complete. That one RPC condition is transient; all
+      // other finalized-tag failures remain terminal and visible.
+      if (!isFinalizedCheckpointStarting(error)) throw error
+      if (Date.now() >= deadline) {
+        throw new Error('the L1 RPC did not publish its first finalized checkpoint in time')
+      }
+      await wait(Math.min(pollMs, Math.max(0, deadline - Date.now())))
+      continue
     }
     if (finalized.number === null || !finalized.hash) {
       throw new Error('the L1 RPC did not return a usable finalized checkpoint')

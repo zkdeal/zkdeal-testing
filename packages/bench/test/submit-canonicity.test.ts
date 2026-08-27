@@ -62,3 +62,37 @@ test('rejects a submit receipt that disappeared or changed block', async () => {
     /different L1 block/u,
   )
 })
+
+test('retries only the fresh-devnet finalized-tag startup condition', async () => {
+  let finalizedReads = 0
+  const retryingClient = client({
+    getBlock: async ({ blockTag }: { blockTag?: string }) => {
+      if (blockTag !== 'finalized') return { number: 80n, hash: blockHash }
+      finalizedReads += 1
+      if (finalizedReads === 1) throw new Error('finalized block not found')
+      return { number: 90n, hash: finalizedHash }
+    },
+  })
+
+  const result = await captureSubmitCanonicity(
+    retryingClient,
+    { transactionHash, blockNumber: 80n, blockHash },
+    { maxWaitMs: 1_000, pollMs: 100 },
+  )
+  assert.equal(finalizedReads, 2)
+  assert.equal(result.status, 'FINALIZED')
+
+  await assert.rejects(
+    captureSubmitCanonicity(
+      client({
+        getBlock: async ({ blockTag }: { blockTag?: string }) => {
+          if (blockTag === 'finalized') throw new Error('permission denied')
+          return { number: 80n, hash: blockHash }
+        },
+      }),
+      { transactionHash, blockNumber: 80n, blockHash },
+      { maxWaitMs: 1_000, pollMs: 100 },
+    ),
+    /permission denied/u,
+  )
+})
