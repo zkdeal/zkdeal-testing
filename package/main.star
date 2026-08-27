@@ -733,6 +733,11 @@ def _start_demo(
         # pointed back at an http one.
         "DEMO_API_URL": demo_api_url,
         "ADMISSION_KEY": ROLE_SERVICE_KEY,
+        # This package always creates its own chain-31337 devnet immediately
+        # above. The coordinator deliberately refuses a raw operator private
+        # key unless that exact development escape is explicit; production
+        # deployments never inherit this environment.
+        "ADMISSION_DEV_PRIVATE_KEY": "1",
         "ADMISSION_TOKEN": DEMO_ADMISSION_TOKEN,
         "ALLOW_UNSIGNED_WRITES": "0",
         "DATA_DIR": "/app/web2-api/server/data",

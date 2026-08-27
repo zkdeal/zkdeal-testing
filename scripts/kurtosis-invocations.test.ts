@@ -46,6 +46,14 @@ describe('user-facing Kurtosis invocations', () => {
     expect(packageSource).toContain('"CUDA_DISABLE_PTX_JIT": "1"')
   })
 
+  test('the local admission key requires an explicit devnet-only escape', () => {
+    const packageSource = readFileSync(resolve(repoRoot, 'package/main.star'), 'utf8')
+    const demoStart = packageSource.slice(packageSource.indexOf('def _start_demo('))
+
+    expect(demoStart).toContain('"CHAIN_ID": "31337"')
+    expect(demoStart).toContain('"ADMISSION_DEV_PRIVATE_KEY": "1"')
+  })
+
   test('the public template contains only digest-pinned published images', () => {
     const template = readFileSync(resolve(repoRoot, 'package/params/public.yaml'), 'utf8')
     expect(template).not.toMatch(/REPLACE-AT-PUBLISH|NOT_BUILT/)
