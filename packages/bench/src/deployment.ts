@@ -97,8 +97,16 @@ export async function deployStack(
   const poolArtifact = await artifact(
     'web3-protocol/contracts/out/RoomPoolManager.sol/RoomPoolManager.json',
   )
+  // The acceptance network is an ephemeral chain that cannot wait out the
+  // protocol timelock's enforced 48-hour Stage-1 floor. Use the same explicit
+  // dev-rig escape as Deploy.s.sol: a stock OpenZeppelin timelock with a zero
+  // delay, so schedule/execute and role separation are still exercised without
+  // weakening ZkdealTimelock itself. Never let this path target another chain.
+  if (chain.chainId !== 31337) {
+    throw new Error('the zero-delay acceptance timelock is restricted to chain 31337')
+  }
   const timelockArtifact = await artifact(
-    'web3-protocol/contracts/out/ZkdealTimelock.sol/ZkdealTimelock.json',
+    'web3-protocol/contracts/out/TimelockController.sol/TimelockController.json',
   )
   const proxyArtifact = await artifact(
     'web3-protocol/contracts/out/ERC1967Proxy.sol/ERC1967Proxy.json',
@@ -125,7 +133,7 @@ export async function deployStack(
     0n,
     [accounts.governance.address],
     [zeroAddress],
-    accounts.governance.address,
+    zeroAddress,
   ])
   const registry = await deployProxy(registryArtifact, [
     timelock,
