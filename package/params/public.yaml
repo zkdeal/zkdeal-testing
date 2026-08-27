@@ -48,7 +48,7 @@ tls_enabled: true
 # operator deliberately fronts that service with another public proxy.
 images:
   prover: docker.io/zkdeal/prover-cuda:sm100-3afe132-20260827@sha256:9ed61ae0ccaba9526f9384b654512a3705ddc927768c8b63096e21a3c039dc59
-  runner: docker.io/zkdeal/coordinator:20260827-hosting-ffc227b@sha256:29fa62f760403b5c028c86aad1435f7f386d1b07775758912f42fb3ec471b27b
-  server: docker.io/zkdeal/coordinator:20260827-hosting-ffc227b@sha256:29fa62f760403b5c028c86aad1435f7f386d1b07775758912f42fb3ec471b27b
+  runner: docker.io/zkdeal/coordinator:20260827-finality-2ba5b08@sha256:541f39fa4d0f5f3778621949e721f30ebd8ad2d83ea1f269a087cc5846be8a22
+  server: docker.io/zkdeal/coordinator:20260827-finality-2ba5b08@sha256:541f39fa4d0f5f3778621949e721f30ebd8ad2d83ea1f269a087cc5846be8a22
   geth: ethereum/client-go:v1.17.3@sha256:ee8af3a081fd8f780509541cf8115be03259e106375e50efa9d995400f86e15d
   lighthouse: sigp/lighthouse:v8.1.3@sha256:44aa773dcf274122c32cc41c4dae7124ed3cab5c267ee82174c6dfd9c688da96
