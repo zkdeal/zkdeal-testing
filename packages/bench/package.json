@@ -1,6 +1,7 @@
 {
   "name": "@zkdeal/bench",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "description": "zkdeal long-lived-room acceptance and capacity evidence",
