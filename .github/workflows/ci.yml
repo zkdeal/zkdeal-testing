@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  NODE_VERSION: 22
+  PNPM_VERSION: 10.13.1
+
+jobs:
+  build-and-test:
+    name: build + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: kurtosis-testing
+      - uses: actions/checkout@v7
+        with:
+          repository: zkdeal/zkdeal-protocol
+          ref: 346409318918a63f85c591ca4713c1792b88cd61
+          path: web3-protocol
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          repository: zkdeal/zkdeal-examples
+          ref: c5b4ee7519da7526c3c066653233a32c479d0b48
+          path: apps-examples
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: kurtosis-testing/pnpm-lock.yaml
+
+      - name: Install
+        working-directory: kurtosis-testing
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck bench package
+        working-directory: kurtosis-testing
+        run: pnpm run build
+      - name: Typecheck scripts
+        working-directory: kurtosis-testing
+        run: pnpm exec tsc --noEmit -p scripts/tsconfig.json
+      - name: Test bench package
+        working-directory: kurtosis-testing
+        run: pnpm --filter @zkdeal/bench test
+      - name: Test portable scripts
+        working-directory: kurtosis-testing
+        # The excluded contract deliberately reads the private umbrella
+        # repository's .github workflows, which are not part of this repo.
+        run: >-
+          pnpm exec vitest run --config scripts/vitest.config.ts
+          --exclude scripts/check-gpu-workflows.test.ts
